@@ -1,60 +1,52 @@
 import 'normalize.css';
 import "./sass/main.sass";
 
-import axios from 'axios'
+// http://api.open-notify.org/iss-now.json
+// https://api.wheretheiss.at/v1/satellites/25544
+
+
 import styles from './modules/mapStyle'
-
-function getPos() {
-  return axios.get('https://api.wheretheiss.at/v1/satellites/25544')
-    .then(res => res.data);
-}
-
-initMap()
+import render from './modules/render'
+import { getInfo, getPos } from './modules/api'
 
 
-function initMap() {
-  const path = []
+window.onload = function initMap() {
   getPos().then(res => {
-
+    const path = []
     const position = new google.maps.LatLng(res.latitude, res.longitude)
+    path.push(position)
 
-    const map = new google.maps.Map(document.getElementById("root"), {
+    const map = new google.maps.Map(document.getElementById("map"), {
       center: position,
       zoom: 4,
       scrollwheel: false,
       streetViewControl: false,
       fullscreenControl: true,
-      // mapTypeId: google.maps.MapTypeId.SATELLITE,
-      styles
+      mapTypeId: google.maps.MapTypeId.SATELLITE,
+      // styles
     });
 
+    function line() {
+      const marker = new google.maps.Polyline({
+        path,
+        strokeColor: '#fff',
+        strokeOpacity: 1,
+        strokeWeight: 4
+      });
+      return marker.setMap(map);
+    }
 
-    setInterval(() => {
-      getPos().then(res => {
-        const position = new google.maps.LatLng(res.latitude, res.longitude)
-        path.push(position)
-        const marker = new google.maps.Polyline({
-          path,
-          geodesic: true,
-          strokeColor: '#fff',
-          strokeOpacity: 0.7,
-          strokeWeight: 8
-        });
-        marker.setMap(map);
-      })
-    }, 1000)
-
+    // setInterval(() => {
+    //   getPos().then(res => {
+    //     const position = new google.maps.LatLng(res.latitude, res.longitude)
+    //     path.push(position)
+    //     line()
+    //     path.shift()
+    //   })
+    // }, 500)
   })
-
-
-
-
 }
 
 
-function marker(map, position) {
-  return new google.maps.Marker({
-    map,
-    position,
-  });
-}
+
+render()
