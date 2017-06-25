@@ -1,13 +1,17 @@
 import { getAll } from './api'
 
-const render = () => {
+const showInfo = () => {
+  const wiki = "https://en.wikipedia.org/wiki/"
+
   getAll().then(({ info, position, ppl }) => {
-
     const el = document.querySelector("div.info");
-    const humans = ppl.map(human => `<li class="name">${human.name}</li>`)
-    .join(" ")
+    el.style = "visibility: visible"
 
+    const humans = ppl.map(human => `<li class="name"><a href="${wiki}${human.name}" target="_blank">${human.name}</a></li>`)
+    .join(" ")
+    
     el.innerHTML = `
+      <span class="header">Current position of the ISS</span>
       <ul class="info-list">
         <li class="lat">
           <span>Latitude: </span>
@@ -31,11 +35,11 @@ const render = () => {
         </li>
       </ul>
       <div class="people">
-        <span> There are ${ppl.length} humans in space </span>
-        <ul> ${humans} </ul>
+        <span class="header"> There are <span style="color: #00BCD4;">${ppl.length}</span> humans in space </span>
+        <ul class="info-list"> ${humans} </ul>
       </div>
     `
   })
 }
 
-export default render
+export default showInfo
