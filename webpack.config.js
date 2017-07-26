@@ -51,6 +51,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      title: "Current position of the ISS",
       minify: { collapseWhitespace: true },
       template: './src/index.html',
       filename: 'index.html'
