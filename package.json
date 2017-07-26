@@ -7,7 +7,7 @@
     "start": "webpack-dev-server",
     "prod": "npm run clean && NODE_ENV=production webpack -p",
     "clean": "rimraf ./dist/*",
-    "deploy": "surge dist"
+    "deploy": "surge dist http://iss.surge.sh"
   },
   "eslintConfig": {
     "parserOptions": {
