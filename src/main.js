@@ -47,6 +47,6 @@ window.onload = function initMap() {
     }, 500)
 
     showInfo()
-    setInterval(showInfo, 1100)
+    setInterval(showInfo, 2000)
   })
 }
