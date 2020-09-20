@@ -1,0 +1,12 @@
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  framework = "#custom"
+[build]
+  publish = "dist"
+  functions = "functions"
+  framework = "#custom"
+[[redirects]]
+  from = "/api"
+  to = "/.netlify/functions/api"
+  status = 200

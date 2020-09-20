@@ -1,52 +1,57 @@
-/*global google, window, document*/
+/*global google*/
 
-/* APIs */
-// http://api.open-notify.org/iss-now.json
-// https://api.wheretheiss.at/v1/satellites/25544
-
-import 'normalize.css';
-import "./main.sass";
-
+import './main.sass'
 import styles from './modules/mapStyle'
-import showInfo from './modules/showInfo'
-import { getPos } from './modules/api'
+import renderInfo from './modules/renderInfo'
 
+const REFRESH_TIME = 5000
+const fetcher = () => fetch('/api').then(res => res.json())
 
 window.onload = function initMap() {
-  getPos().then(res => {
-    const path = []
-    const position = new google.maps.LatLng(res.latitude, res.longitude)
-    path.push(position)
+  fetcher().then(data => {
+    const center = new google.maps.LatLng(data.info.latitude, data.info.longitude)
+    const path = [center]
 
-    const map = new google.maps.Map(document.getElementById("map"), {
-      center: position,
+    const map = new google.maps.Map(document.getElementById('map'), {
+      center,
       zoom: 4,
       scrollwheel: false,
       streetViewControl: false,
       fullscreenControl: true,
-      styles
-    });
+      styles: styles[data.info.visibility]
+    })
 
-    function line() {
-      const marker = new google.maps.Polyline({
-        path,
-        strokeColor: '#fff',
-        strokeOpacity: 1,
-        strokeWeight: 5
-      });
-      return marker.setMap(map);
-    }
+    new google.maps.Circle({
+      strokeColor: '#fff',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillOpacity: 1,
+      fillColor: '#fff',
+      map,
+      center,
+      radius: 20*1000
+    })
+
+    renderInfo(data)
 
     setInterval(() => {
-      getPos().then(res => {
-        const position = new google.maps.LatLng(res.latitude, res.longitude)
-        path.push(position)
-        line()
+      fetcher().then(data => {
+        path.push(new google.maps.LatLng(data.info.latitude, data.info.longitude))
+
+        const marker = new google.maps.Polyline({
+          path,
+          strokeColor: '#fff',
+          strokeOpacity: 1,
+          strokeWeight: 5
+        })
+
+
+        marker.setMap(map)
+        renderInfo(data)
+
         path.shift()
       })
-    }, 500)
 
-    showInfo()
-    setInterval(showInfo, 2000)
+    }, REFRESH_TIME)
   })
 }
