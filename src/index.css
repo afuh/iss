@@ -1,66 +1,94 @@
+:root {
+  --primary: #00BCD4;
+  --transition: all 0.2s;
+  --unit: 6px;
+}
+
 * {
   box-sizing: border-box;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif; }
+  font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;
+}
 
 a, span {
-  color: whitesmoke; }
+  color: whitesmoke;
+}
 
 ul {
   padding-left: 0;
-  margin: 0; }
-  ul li {
-    list-style-type: none; }
+  margin: 0;
+}
+
+ul li {
+  list-style-type: none;
+}
 
 #map {
-  margin: 0 auto;
   width: 100%;
-  height: 100vh; }
+  height: 100vh;
+}
 
 .info {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  font-size: 15px;
-  display: flex;
+  border-top-right-radius: var(--unit);
+  border-bottom-right-radius: var(--unit);
   flex-flow: column;
-  justify-content: space-around;
-  padding: 30px 20px;
-  color: #fff;
-  display: flex;
+  padding: calc(var(--unit)*3);
   position: absolute;
-  top: calc(50% - 200px);
+  top: 25%;
   left: 0;
-  background: rgba(0, 0, 0, 0.8);
-  visibility: hidden;
+  background: #000;
   opacity: 0.1;
-  transition: all 0.4s; }
-  .info:hover {
-    opacity: 0.9; }
-  .info .info-list li {
-    padding: 6px; }
-    .info .info-list li span {
-      font-weight: 200; }
-    .info .info-list li span:first-child {
-      font-weight: 600; }
-  .info .people {
-    margin-top: 20px; }
-  .info .header {
-    font-size: 16px;
-    font-weight: 600;
-    padding: 6px; }
-    .info .header li.name span {
-      font-weight: 200; }
+  transition: var(--transition);
+}
 
-a {
+.info:hover {
+  opacity: 0.8;
+}
+
+.info .block:not(:last-child) {
+  margin-bottom: calc(var(--unit)*3);
+}
+
+.info .header {
+  display: block;
+  font-weight: 700;
+  font-size: calc(var(--unit)*3);
+  margin-bottom: calc(var(--unit)*3);
+}
+
+.info .item {
+  font-weight: 200;
+  margin-bottom: calc(var(--unit)*2);
+}
+
+.info .item .title {
+  font-weight: 700;
+}
+
+.info .humans .item {
+  font-weight: 500;
+}
+
+.info .header li.name span {
+  font-weight: 200;
+}
+
+.info .human-length {
+  color: var(--primary);
+}
+
+.info a {
   text-decoration: none;
-  border-bottom: 1px solid #00BCD4;
-  transition: all 0.2s; }
-  a:hover {
-    color: #00BCD4;
-    border: none; }
-  a:visited {
-    border-bottom: 1px solid #00BCD4; }
+  border-bottom: 1px solid var(--primary);
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--primary);
+  border: none;
+}

@@ -3,56 +3,68 @@ import 'regenerator-runtime/runtime'
 
 import './index.css'
 import styles from './modules/mapStyle'
-import renderInfo from './modules/renderInfo'
+import renderInfoBox from './modules/renderInfo'
 
 const REFRESH_TIME = 5000
-const fetcher = () => fetch('/api').then(res => res.json())
+const ROOT = document.getElementById('map')
+const COLOR = '#fff'
 
-window.onload = function initMap() {
-  fetcher().then(data => {
-    const center = new google.maps.LatLng(data.info.latitude, data.info.longitude)
-    const path = [center]
+const fetchApi = () => fetch('/api').then(res => res.json())
+const getLatLng = ({ info }) => new google.maps.LatLng(info.latitude, info.longitude)
 
-    const map = new google.maps.Map(document.getElementById('map'), {
-      center,
-      zoom: 4,
-      scrollwheel: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles: styles[data.info.visibility]
-    })
+const init = ({ center }) => {
+  const path = [center]
 
-    new google.maps.Circle({
-      strokeColor: '#fff',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillOpacity: 1,
-      fillColor: '#fff',
-      map,
-      center,
-      radius: 20*1000
-    })
-
-    renderInfo(data)
-
-    setInterval(() => {
-      fetcher().then(data => {
-        path.push(new google.maps.LatLng(data.info.latitude, data.info.longitude))
-
-        const marker = new google.maps.Polyline({
-          path,
-          strokeColor: '#fff',
-          strokeOpacity: 1,
-          strokeWeight: 5
-        })
-
-
-        marker.setMap(map)
-        renderInfo(data)
-
-        path.shift()
+  return {
+    circle(map, data) {
+      const drawCircle = new google.maps.Circle({
+        strokeColor: COLOR,
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillOpacity: 1,
+        fillColor: COLOR,
+        center,
+        radius: 20 * 1000
       })
 
-    }, REFRESH_TIME)
+      drawCircle.setMap(map)
+      renderInfoBox(data)
+    },
+    line(map, data) {
+      path.push(getLatLng({ info: data.info }))
+
+      const drawLine = new google.maps.Polyline({
+        path,
+        strokeColor: COLOR,
+        strokeOpacity: 1,
+        strokeWeight: 5
+      })
+
+      drawLine.setMap(map)
+      renderInfoBox(data)
+      path.shift()
+    }
+  }
+}
+
+window.onload = async () => {
+  const data = await fetchApi()
+  const center = getLatLng({ info: data.info })
+  const render = init({ center })
+
+  const map = new google.maps.Map(ROOT, {
+    center,
+    zoom: 4,
+    scrollwheel: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+    styles: styles[data.info.visibility]
   })
+
+  render.circle(map, data)
+
+  setInterval(async () => {
+    const data = await fetchApi()
+    render.line(map, data)
+  }, REFRESH_TIME)
 }

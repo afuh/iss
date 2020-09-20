@@ -1,7 +1,7 @@
 {
   "name": "iss",
   "version": "1.0.0",
-  "description": "Current position of the International Space Station",
+  "description": "Current position of the ISS",
   "main": "dist/index.html",
   "scripts": {
     "dev": "parcel src/index.html --port 3000",
@@ -13,6 +13,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.9.0",
     "eslint-config-afuh": "^0.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
