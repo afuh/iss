@@ -1,52 +1,70 @@
-/*global google, window, document*/
+/*global google*/
+import 'regenerator-runtime/runtime'
 
-/* APIs */
-// http://api.open-notify.org/iss-now.json
-// https://api.wheretheiss.at/v1/satellites/25544
-
-import 'normalize.css';
-import "./main.sass";
-
+import './index.css'
 import styles from './modules/mapStyle'
-import showInfo from './modules/showInfo'
-import { getPos } from './modules/api'
+import renderInfoBox from './modules/renderInfo'
 
+const REFRESH_TIME = 5000
+const ROOT = document.getElementById('map')
+const COLOR = '#fff'
 
-window.onload = function initMap() {
-  getPos().then(res => {
-    const path = []
-    const position = new google.maps.LatLng(res.latitude, res.longitude)
-    path.push(position)
+const fetchApi = () => fetch('/api').then(res => res.json())
+const getLatLng = ({ info }) => new google.maps.LatLng(info.latitude, info.longitude)
 
-    const map = new google.maps.Map(document.getElementById("map"), {
-      center: position,
-      zoom: 4,
-      scrollwheel: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles
-    });
+const init = ({ center }) => {
+  const path = [center]
 
-    function line() {
-      const marker = new google.maps.Polyline({
+  return {
+    circle(map, data) {
+      const drawCircle = new google.maps.Circle({
+        strokeColor: COLOR,
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillOpacity: 1,
+        fillColor: COLOR,
+        center,
+        radius: 20 * 1000
+      })
+
+      drawCircle.setMap(map)
+      renderInfoBox(data)
+    },
+    line(map, data) {
+      path.push(getLatLng({ info: data.info }))
+
+      const drawLine = new google.maps.Polyline({
         path,
-        strokeColor: '#fff',
+        strokeColor: COLOR,
         strokeOpacity: 1,
         strokeWeight: 5
-      });
-      return marker.setMap(map);
-    }
-
-    setInterval(() => {
-      getPos().then(res => {
-        const position = new google.maps.LatLng(res.latitude, res.longitude)
-        path.push(position)
-        line()
-        path.shift()
       })
-    }, 500)
 
-    showInfo()
-    setInterval(showInfo, 2000)
+      drawLine.setMap(map)
+      renderInfoBox(data)
+      path.shift()
+    }
+  }
+}
+
+window.onload = async () => {
+  const data = await fetchApi()
+  const center = getLatLng({ info: data.info })
+  const render = init({ center })
+
+  const map = new google.maps.Map(ROOT, {
+    center,
+    zoom: 4,
+    scrollwheel: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+    styles: styles[data.info.visibility]
   })
+
+  render.circle(map, data)
+
+  setInterval(async () => {
+    const data = await fetchApi()
+    render.line(map, data)
+  }, REFRESH_TIME)
 }
