@@ -1,6 +1,7 @@
 /*global google*/
+import 'regenerator-runtime/runtime'
 
-import './main.sass'
+import './index.css'
 import styles from './modules/mapStyle'
 import renderInfo from './modules/renderInfo'
 
